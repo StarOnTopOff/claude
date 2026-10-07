@@ -1,0 +1,7 @@
+== ou offb_lpb+lpm: logloss tr1x2,trOU,va1x2,vaOU = [1.00862, 0.6837, 1.00272, 0.67841]
+== ou offb_lpb+lpm+ratio+ovr: logloss tr1x2,trOU,va1x2,vaOU = [1.00862, 0.68375, 1.00272, 0.67845]
+== ou offb_lpb+lpm+ratio+ovr+x1x2+ah: logloss tr1x2,trOU,va1x2,vaOU = [1.00862, 0.68403, 1.00272, 0.67854]
+== ou offb_lpb+lpm+ratio+ovr+x1x2+ah+lg: logloss tr1x2,trOU,va1x2,vaOU = [1.00862, 0.68438, 1.00272, 0.67878]
+== ou offm_lpb+lpm: logloss tr1x2,trOU,va1x2,vaOU = [1.00862, 0.6837, 1.00272, 0.67841]
+== ou offm_lpb+lpm+ratio+ovr: logloss tr1x2,trOU,va1x2,vaOU = [1.00862, 0.68376, 1.00272, 0.67845]
+== ou offm_lpb+lpm+ratio+ovr+x1x2+ah: logloss tr1x2,trOU,va1x2,vaOU = [1.00862, 0.68403, 1.00272, 0.67854]

@@ -1,0 +1,3 @@
+== 1x2 offb_lpb+lpm: logloss tr1x2,trOU,va1x2,vaOU = [1.00841, 0.68364, 1.00236, 0.67836]
+== 1x2 offb_lpb+lpm+ratio+ovr: logloss tr1x2,trOU,va1x2,vaOU = [1.00853, 0.68364, 1.00242, 0.67836]
+== 1x2 offb_lpb+lpm+ratio+ovr+ah+ou: logloss tr1x2,trOU,va1x2,vaOU = [1.00854, 0.68364, 1.00242, 0.67836]

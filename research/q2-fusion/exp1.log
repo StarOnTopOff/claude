@@ -1,0 +1,1 @@
+baseline logloss {'train_1X2': 1.00862, 'train_OU': 0.68364, 'val_1X2': 1.00272, 'val_OU': 0.67836}

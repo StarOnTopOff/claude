@@ -13,6 +13,7 @@ from zoneinfo import ZoneInfo
 import numpy as np
 import pandas as pd
 
+import method
 from config import LEAGUES, OUT, RAW
 from data import latest_elo_model, load_matches
 from fetch import current_season
@@ -227,6 +228,17 @@ def run(today=None):
         for k in ("b365", "max", "ou", "mou"):
             if x[k]:
                 target[k] = x[k]
+        # the method's probability for every selection, priced at Bet365 and at the best market price
+        p = method.upcoming_p(x["b365"], x["ou"])
+        cands = []
+        for k, sel in enumerate("HDA"):
+            if sel in p and x["max"]:
+                cands.append({"sel": sel, "mkt": "1X2", "p": round(p[sel], 5), "b365": x["b365"][k], "mx": x["max"][k]})
+        for k, sel in enumerate("OU"):
+            if sel in p and x["mou"]:
+                cands.append({"sel": sel, "mkt": "OU", "p": round(p[sel], 5), "b365": x["ou"][k], "mx": x["mou"][k]})
+        if cands:
+            target["cands"] = cands
         n_odds += 1
 
     now_ms = int(dt.datetime.combine(today, dt.time(0), dt.timezone.utc).timestamp() * 1000)

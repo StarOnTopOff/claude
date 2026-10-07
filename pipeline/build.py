@@ -11,7 +11,7 @@ import gzip
 import json
 import re
 
-from config import DIST, LEAGUE_GROUPS, OUT, ROOT, WEB
+from config import DIST, OUT, ROOT, WEB
 
 LINKS_FILE = ROOT / "links.json"  # {"artifact": "...", "pages": "..."} used by the QR code button
 QR_CDN = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"
@@ -19,9 +19,10 @@ QR_FALLBACK = "https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"
 
 
 def build():
-    bt = json.loads((OUT / "backtest.json").read_text())
+    bt = json.loads((OUT / "method.json").read_text())
     fx = json.loads((OUT / "fixtures.json").read_text())
-    payload = json.dumps({"bt": bt, "fx": fx, "groups": LEAGUE_GROUPS}, separators=(",", ":"), ensure_ascii=False)
+    method = bt.pop("method")
+    payload = json.dumps({"bt": bt, "fx": fx, "method": method}, separators=(",", ":"), ensure_ascii=False)
     b64 = base64.b64encode(gzip.compress(payload.encode(), 9)).decode()
 
     css = (WEB / "styles.css").read_text()
@@ -37,7 +38,7 @@ def build():
     )
     DIST.mkdir(parents=True, exist_ok=True)
     full = (
-        '<!doctype html>\n<html lang="fr">\n<head>\n<meta charset="utf-8">\n'
+        '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
         f"{head}</head>\n<body>\n{body}{scripts}</body>\n</html>\n"
     )
