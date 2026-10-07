@@ -21,7 +21,7 @@ function fixtureBrief(f) {
   };
 }
 function methodBrief() {
-  const st = S.data.bt.stats, f = String(riskF());
+  const st = S.data.bt.stats, f = fkey(riskF());
   const t = st.test[f], s = st.sel[f];
   return {
     rule: M().summary, max_bets_per_day: M().cfg.K, kelly_fraction: riskF(),
@@ -162,7 +162,7 @@ function findFixture(text) {
 }
 
 function localAnswer(q) {
-  const ql = q.toLowerCase(), now = Date.now(), st = S.data.bt.stats, f = String(riskF());
+  const ql = q.toLowerCase(), now = Date.now(), st = S.data.bt.stats, f = fkey(riskF());
   const t = st.test[f];
   const L = [];
   // a team mentioned?

@@ -40,7 +40,7 @@ function renderQR() {
   S.ui.qrUrl = cur;
   el.innerHTML = `
     <div class="sheet-head"><h2>Open on your phone</h2><button class="icon-btn" data-close aria-label="Close">${icon("i-x")}</button></div>
-    ${cands.length > 1 ? `<div class="seg qr-seg">${cands.map(([l, u]) => `<button data-qr="${esc(u)}" aria-pressed="${u === cur}">${esc(l)}</button>`).join("")}</div>` : ""}
+    ${cands.length > 1 ? `<div class="segx qr-seg">${cands.map(([l, u]) => `<button data-qr="${esc(u)}" aria-pressed="${u === cur}">${esc(l)}</button>`).join("")}</div>` : ""}
     <div class="qr-box" id="qr-box"></div>
     <p class="muted center">Point your phone's camera at the code, then tap the link that pops up.</p>
     <div class="row nowrap"><input class="input" id="qr-url" value="${esc(cur)}" placeholder="Paste the link to share" aria-label="QR code link"><button class="btn primary icon-only" id="qr-copy" aria-label="Copy link">${icon("i-copy")}</button></div>`;
@@ -82,12 +82,12 @@ function renderSettings() {
     <div class="set-group">
       <div class="set-label">Bankroll</div>
       <div class="set-row"><div><div class="l">Starting bankroll</div><div class="d">Your bets are added on top of it. Stakes follow your current bankroll.</div></div><input class="input num w-110" id="set-bank" inputmode="decimal" value="${st.bankroll}" aria-label="Starting bankroll"></div>
-      <div class="set-row"><div class="l">Currency</div><div class="seg">${["USD", "EUR", "GBP"].map((c) => `<button data-cur="${c}" aria-pressed="${st.currency === c}">${c === "USD" ? "$" : c === "EUR" ? "€" : "£"}</button>`).join("")}</div></div>
+      <div class="set-row"><div class="l">Currency</div><div class="segx">${["USD", "EUR", "GBP"].map((c) => `<button data-cur="${c}" aria-pressed="${st.currency === c}">${c === "USD" ? "$" : c === "EUR" ? "€" : "£"}</button>`).join("")}</div></div>
     </div>
 
     <div class="set-group">
       <div class="set-label">Risk level</div>
-      <div class="risk-list">${RISK_PROFILES.map((r) => { const t = test[String(r.f)]; return `
+      <div class="risk-list">${RISK_PROFILES.map((r) => { const t = test[fkey(r.f)]; return `
         <button class="risk ${riskF() === r.f ? "on" : ""}" data-risk="${r.f}">
           <span class="risk-name">${r.name}${r.f === M().kelly_f ? ` <em>recommended</em>` : ""}</span>
           <span class="risk-note">${r.note}</span>

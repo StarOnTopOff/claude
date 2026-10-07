@@ -29,6 +29,7 @@ function announcePicks() {
 }
 function bindChrome() {
   $("#btn-qr").onclick = () => openSheet($("#modal-qr"), renderQR);
+  $("#side-qr").onclick = () => openSheet($("#modal-qr"), renderQR);
   $("#btn-notif").onclick = () => openSheet($("#sheet-notif"), renderNotifSheet);
   $("#btn-settings").onclick = () => openSheet($("#sheet-settings"), renderSettings);
   $("#scrim").onclick = closeSheet;
@@ -52,7 +53,7 @@ async function boot() {
   }
   S.ready = true;
   go(location.hash.slice(1) || "home", false);
-  renderStatus(); updateBadge(); settleJournal(); announcePicks();
+  renderStatus(); updateBadge(); settleJournal(); announcePicks(); renderSidebar();
   setInterval(tick, 1000);
   liveLoop(true);
   if (window.claude?.use) {

@@ -13,12 +13,33 @@ from config import FIRST_SEASON, LEAGUES, RAW
 OUTCOMES = np.array(["H", "D", "A"])
 
 
-def load_matches(path=None):
-    path = path or RAW / "matches" / "data" / "Matches.csv"
-    df = pd.read_csv(path, low_memory=False)
+MATCHES_CSV = RAW / "matches" / "data" / "Matches.csv"
+
+
+def read_raw(path=None):
+    """The historical dataset as published (one row per match, all divisions, not cleaned)."""
+    return pd.read_csv(path or MATCHES_CSV, low_memory=False)
+
+
+def load_matches(path=None, extra=None):
+    """Played matches of our 22 divisions, cleaned and sorted (row order = harness `mid`).
+
+    extra: more raw rows in the same schema, appended before cleaning (live current-season
+    results from football-data.co.uk, see livedata.py)."""
+    raw = read_raw(path)
+    if extra is not None and len(extra):
+        raw = pd.concat([raw, extra.reindex(columns=raw.columns).astype(raw.dtypes.to_dict())], ignore_index=True)
+    return clean_matches(raw)
+
+
+def clean_matches(df, keep_unplayed=False):
+    """Filter to our divisions, parse dates, add `season`, sort, and clean the odds.
+
+    keep_unplayed: keep rows without a result (upcoming fixtures with pre-match odds)."""
     df = df[df.Division.isin(LEAGUES)].copy()
     df["MatchDate"] = pd.to_datetime(df["MatchDate"])
-    df = df.dropna(subset=["FTHome", "FTAway", "FTResult"])
+    if not keep_unplayed:
+        df = df.dropna(subset=["FTHome", "FTAway", "FTResult"])
     df["season"] = np.where(df.MatchDate.dt.month >= 7, df.MatchDate.dt.year, df.MatchDate.dt.year - 1)
     df = df.sort_values(["MatchDate", "MatchTime", "Division", "HomeTeam"], kind="mergesort").reset_index(drop=True)
 

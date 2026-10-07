@@ -18,7 +18,7 @@ const pageDir = path.dirname(path.resolve(file));
 function ensureFont(pkg) {
   const dir = path.join(HERE, "node_modules", "@fontsource", pkg);
   if (!fs.existsSync(dir)) {
-    try { execSync(`npm install --silent --no-save @fontsource/${pkg}`, { cwd: HERE, stdio: "ignore", timeout: 90000 }); } catch { /* unknown family */ }
+    try { execSync(`npm install --silent --save @fontsource/${pkg}`, { cwd: HERE, stdio: "ignore", timeout: 90000 }); } catch { /* unknown family */ }
   }
   return fs.existsSync(dir) ? dir : null;
 }
@@ -61,7 +61,8 @@ function fontCss(url) {
       if (url.startsWith("https://fonts.googleapis.com/css")) return route.fulfill({ body: fontCss(url), contentType: "text/css" });
       if (url.startsWith("http://fonts.local/")) {
         const [, pkg, fileName] = new URL(url).pathname.split("/");
-        return route.fulfill({ path: path.join(HERE, "node_modules", "@fontsource", pkg, "files", fileName), contentType: "font/woff2" });
+        const fp = path.join(HERE, "node_modules", "@fontsource", pkg, "files", fileName);
+        return fs.existsSync(fp) ? route.fulfill({ path: fp, contentType: "font/woff2" }) : route.abort();
       }
       if (url.includes("qrcode")) {
         const q = path.join(HERE, "..", "..", "research", "design", "qrcode.js");

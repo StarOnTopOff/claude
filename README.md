@@ -1,65 +1,73 @@
-# Abysse · value betting lab
+# Abysse
 
-Appli web de paris sportifs football : stratégie backtestée sur 20 ans, matchs à venir avec compte à rebours, scores en direct, comparateur de cotes Stake, journal de paris, analyste IA, notifications et QR code pour ouvrir l'appli sur le téléphone. Design « liquid glass » sombre, noir et bleu.
+A football value-betting app: at most **3 picks a day**, the minimum odds to accept on Stake, a Kelly-sized stake from your own bankroll, live scores and kick-off countdowns, a full backtest you can replay from any date, an AI analyst, notifications and a QR code to open it on your phone. Dark "liquid glass" design, all in English.
 
-Tout tient dans un seul fichier : [`dist/index.html`](dist/index.html). Ouvre-le dans un navigateur, ou déploie-le avec GitHub Pages (voir plus bas).
+The whole app is one file: [`dist/index.html`](dist/index.html). Open it in a browser or publish it with GitHub Pages (see below).
 
-## Le résultat du backtest
+## The method and its track record
 
-- **156 928 matchs** de 22 divisions européennes, saison 2005/06 → septembre 2026, avec les cotes Bet365 et les meilleures cotes du marché relevées avant chaque match.
-- **20 480 stratégies** testées : source de probabilité (marché sans marge, Elo, mélanges), prix d'exécution (un seul bookmaker ou meilleure cote), marché (1N2, nul, domicile, extérieur, over/under 2,5), seuil d'avantage, plage de cotes, groupe de championnats.
-- **Trois périodes séparées** : entraînement 2005–2014, validation 2014–2020, test 2020→2026. La stratégie retenue est choisie sur les deux premières uniquement, puis mesurée sur la troisième.
+**Fusion model, top 3 a day.** Bet365's prices with the margin removed are the starting point. Two models (a regularised logistic model and gradient-boosted trees, refit every July on the previous ten seasons) nudge the home/draw/away probabilities. They use how the other pre-match markets (over/under 2.5, Asian handicap) disagree with the 1X2 price, plus each team's Elo, attack/defence ratings, results against market expectations, shots and corners, all from matches played before the day.
 
-| Stratégie championne | Paris | ROI entraînement | ROI validation | ROI hors-échantillon |
-|---|---:|---:|---:|---:|
-| 1N2, cote 1,01–1,60, 22 divisions, value > 0 % vs Bet365 sans marge, misé à la meilleure cote | 12 166 | +2,1 % | +2,4 % | **+2,7 %** (3 825 paris) |
+A bet qualifies when the best available price beats the fair probability by more than 2%, at odds below 4.0, one bet per match. The app keeps the 3 biggest edges of the day and stakes a fraction of Kelly on your current bankroll.
 
-Courbe très régulière (R² = 0,98 sur 21 saisons), pire creux de 23 unités pour +289 unités de gain à mise fixe.
+How it was chosen, so the 2020+ numbers mean something:
 
-Ce que le backtest dit aussi, honnêtement :
+- **Data:** 156,928 matches, 22 European divisions, 2006→Sept 2026, with Bet365 and best-market odds collected before each match ([football-data.co.uk](https://www.football-data.co.uk/) via the open [Club-Football-Match-Data](https://github.com/xgabora/Club-Football-Match-Data-2000-2025) set).
+- **One shared harness:** [`research/harness.py`](research/harness.py). Configurations are picked on **July 2006 → June 2020 only**. **July 2020 → today** is kept aside and reported once.
+- **Four research tracks** competed on that harness: baseline, odds-only model, fusion model, adaptive selection. Each was followed by an independent adversarial audit.
+- **Picked by the 2006-2020 score:** fusion won clearly (1.39 vs 0.75, 0.52 and 0.48 for the others).
 
-- **Jouer chez un seul bookmaker ne tient pas.** Les 10 stratégies à un seul bookmaker qui passaient l'entraînement et la validation finissent toutes négatives après 2020 (de −7 % à −18 %). Sur les 3 277 qui ont au moins 200 paris après 2020, le ROI médian est de −10,8 % ; les 88 positives perdaient sur les périodes précédentes, donc du hasard. La marge du bookmaker mange l'avantage d'un modèle Elo.
-- Le gain vient de **prendre le bookmaker qui paie au-dessus du prix juste du marché**. Pour Stake, la règle de l'appli est donc : ne miser que si la cote Stake dépasse le prix juste calculé à partir d'un autre bookmaker.
-- Le « choix naïf » (meilleure stratégie sur la seule période d'entraînement) passe de +35 % à −17 % ensuite. Le Labo de l'appli montre ce piège pour les 20 480 stratégies.
-- L'avantage est mince. Les bookmakers limitent les comptes gagnants. Rien n'est garanti.
+| Since July 2020 (out of sample) | $1,000 became | Per year | Worst drop |
+|---|---:|---:|---:|
+| Steady (¼ Kelly, recommended) | **$18,070** | +60% | −36% |
+| Balanced (½ Kelly) | $133,633 | +121% | −62% |
+| Aggressive (¾ Kelly) | $412,385 | +165% | −79% |
+| Full Kelly | $534,699 | +177% | −89% |
 
-## Fonctionnalités
+4,188 bets, +4.5% profit per bet, 39% of bets won, average odds 2.92. Calendar years at ¼ Kelly: 2020 (H2) +3%, 2021 +132%, 2022 −4.5%, 2023 +101%, 2024 +55%, 2025 +115%, 2026 (to Sept) +18%.
 
-| Onglet | Contenu |
+### What the audits found
+
+- **No data leak and no test snooping.** The numbers reproduce exactly.
+- **The per-bet edge is thin and close to plain best-price shopping.** The bigger bankroll comes from more bets and larger Kelly stakes.
+- **Profit is concentrated.** The top 1% of bets carry a large share of it, and 2021 alone about 40%.
+- **It depends on getting the best of ~17 bookmakers before kick-off, with no stake limits.** A price 1–2% worse cuts results sharply, and bookmakers limit winning accounts.
+- **Treat the totals as an optimistic scenario, not a forecast.** Full notes are in `research/*/AUDIT.md`.
+
+## The app
+
+| Screen | What it does |
 |---|---|
-| Accueil | Stratégie championne, courbe 2005→2026, prochain coup d'envoi en compte à rebours, paris recommandés ou favoris à vérifier, matchs en direct |
-| Matchs | Calendrier 2026-27 (8 championnats), probabilités 1N2, cotes justes, Elo, score et minute en direct, suivi par étoile, test rapide des cotes Stake |
-| Stake | Comparateur : cotes Stake + cotes de référence → cote juste, avantage, mise Kelly, verdict selon la règle validée. Remplissage par copier-coller du texte Stake ou par capture d'écran lue par l'IA. Journal de paris réglé automatiquement au score final |
-| Backtest | Rejoue n'importe quelle stratégie phare sur la période choisie (tout, hors-échantillon, 2025→, 2026→, 12 mois, dates libres), avec bankroll et méthode de mise (Kelly 1/8–1/2, % de bankroll, mise fixe) |
-| Labo | Nuage des 20 480 stratégies avant/après, classement des stratégies robustes, méthode |
-| IA | Claude branché sur les données de l'appli (quand la page est ouverte dans Claude), sinon analyste intégré |
+| Home | Bankroll since July 2020, today's picks (min odds on Stake, edge, stake), live scores, next kick-offs with countdowns, the latest picks with results |
+| Matches | Every fixture of 8 leagues: countdown, live score, outcome probabilities and fair odds, star to follow |
+| Stake | Check a Stake price against the method's fair price: verdict and Kelly stake. Fill it by pasting Stake's text or dropping a screenshot (AI). "My bets" settles itself at full time and drives your bankroll |
+| Backtest | Replay since Jul 2020, 2025, 2026, last 12 months, since 2006 or custom dates; 4 risk levels; any starting bankroll; yearly and monthly results; every bet |
+| AI | Claude reads today's picks, the backtest and your bets (inside Claude). Elsewhere, a built-in analyst answers |
 
-Plus : notifications (rappel 15 min avant le coup d'envoi, buts, value, résultat de tes paris), QR code, réglages de bankroll, limite de mise quotidienne.
+## Live data
 
-## Direct et données
+- **Hosted version** (GitHub Pages or a local file): fetches fixtures and results from [openfootball](https://github.com/openfootball/football.json) and live scores from ESPN in the browser.
+- **GitHub Actions refresh**: every 6 hours it downloads the latest results, stats and bookmaker odds from football-data.co.uk, recomputes the fusion probabilities for upcoming matches, and redeploys. That is what fills "Today's picks".
+- **The Claude artifact** has no network access. It shows the snapshot embedded at build time; its AI works.
 
-- La version hébergée (GitHub Pages ou fichier local) récupère le calendrier et les résultats sur [openfootball](https://github.com/openfootball/football.json) et les scores en direct sur l'API publique d'ESPN.
-- La version ouverte dans Claude (artefact) n'a pas accès au réseau : elle affiche l'instantané embarqué, mais l'IA y fonctionne.
-- Le workflow GitHub Actions relance tout le pipeline toutes les 6 heures : nouvelles données, nouveau backtest, Elo mis à jour, et cotes Bet365 + meilleures cotes de la semaine depuis [football-data.co.uk](https://www.football-data.co.uk/). Ce sont ces cotes qui alimentent les « paris recommandés » automatiques.
-
-Sources : football-data.co.uk (via le jeu de données ouvert [Club-Football-Match-Data](https://github.com/xgabora/Club-Football-Match-Data-2000-2025)), ClubElo, openfootball, ESPN.
-
-## Lancer en local
+## Run it locally
 
 ```bash
 pip install -r requirements.txt
-python pipeline/run_all.py      # télécharge, backteste (≈ 1 min), construit dist/index.html
-python -m http.server -d dist   # puis http://localhost:8000
+python pipeline/run_all.py      # download, rebuild the method's history and picks, build dist/index.html
+python -m http.server -d dist   # http://localhost:8000
 ```
 
-Scripts séparés dans `pipeline/` : `fetch.py`, `backtest.py`, `fixtures.py`, `build.py`. Sources du site dans `web/`.
+- `pipeline/`: data download, the fusion model (`pipeline/fusion/`), backtest export, fixtures and picks, single-file build.
+- `research/`: the harness, the four research tracks and their audits.
+- `web/`: the app's source.
 
-## Déployer sur GitHub Pages
+## Publish on GitHub Pages
 
-1. Fusionne cette branche dans `main`.
-2. Dans le dépôt : **Settings → Pages → Build and deployment → Source : GitHub Actions**.
-3. Le workflow `Refresh data and deploy` publie le site sur `https://starontopoff.github.io/claude/` puis le rafraîchit toutes les 6 heures. Le bouton QR code de l'appli propose ce lien.
+1. Merge this branch into `main`.
+2. In the repo: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+3. The workflow `Refresh data and deploy` publishes to `https://starontopoff.github.io/claude/` and refreshes it every 6 hours. The app's QR button points there.
 
-## Jeu responsable
+## Responsible gambling
 
-Le pari reste un jeu d'argent. Même une stratégie positive traverse de longues séries perdantes. Fixe une limite et tiens-la. Stake n'est pas agréé par l'ANJ en France. Aide : Joueurs Info Service, 09 74 75 13 13.
+Betting is gambling. Even a winning method goes through long losing runs, and bookmakers restrict winning accounts. Only bet what you can afford to lose. Stake is not licensed in France. Help: BeGambleAware.org · Joueurs Info Service 09 74 75 13 13.

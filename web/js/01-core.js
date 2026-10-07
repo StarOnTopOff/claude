@@ -42,7 +42,7 @@ const fmtWhen = (t) => {
   const day = diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : new Intl.DateTimeFormat(LOCALE, { weekday: "short" }).format(new Date(t));
   return `${day} ${fmtTime(t)}`;
 };
-const icon = (id, c = "") => `<svg class="${c}" aria-hidden="true"><use href="#${id}"/></svg>`;
+const icon = (id, c = "i") => `<svg class="${c}" aria-hidden="true"><use href="#${id}"/></svg>`;
 
 function countdownParts(ms) {
   ms = Math.max(0, ms);
@@ -158,8 +158,8 @@ function go(view, push = true) {
   S.view = view;
   $$(".view").forEach((v) => v.classList.toggle("active", v.id === "view-" + view));
   $$("[data-nav]").forEach((a) => { if (a.dataset.nav === view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
-  movePill?.();
-  if (S.ready && RENDER[view]) RENDER[view]();
+  movePill();
+  if (S.ready && RENDER[view]) { RENDER[view](); renderSidebar(); buildLenses(); }
   if (push && location.hash !== "#" + view) history.replaceState(null, "", "#" + view);
   window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
 }

@@ -39,6 +39,7 @@ function eloUpdate(home, away, hg, ag) {
 const M = () => S.data.method;
 const SEL_LABEL = { H: "Home", D: "Draw", A: "Away", O: "Over 2.5", U: "Under 2.5" };
 function riskF() { return S.settings.risk ?? M().kelly_f; }
+const fkey = (f) => (Number.isInteger(f) ? f.toFixed(1) : String(f)); // stats keys come from Python: "0.25" … "1.0"
 const RISK_PROFILES = [
   { f: 0.25, name: "Steady", note: "Quarter Kelly · smallest swings" },
   { f: 0.5, name: "Balanced", note: "Half Kelly · the usual sweet spot" },
