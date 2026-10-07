@@ -32,7 +32,7 @@ def wf(feats, model_fn, region=-0.05, last=2019, name=None):
         if s > last:
             break
         tr = ok & (season >= 2005) & (season < s) & (edge_b > region) & ratio_ok
-        te = ok & (season == s)
+        te = ok & (season == s) & (edge_b > region)   # outside the region: market prob (edge < region -> never bet)
         m = model_fn().fit(Xv[tr], off2[tr], win[tr])
         p[te] = m.predict(Xv[te], off2[te])[:, 1]
     # rows outside the model (no max odds etc.): fall back to the market probability
@@ -54,6 +54,13 @@ def show(name, p, sel=True):
 if __name__ == "__main__":
     base = ["lp_b", "r", "r_oth_max", "r_oth_mean", "ovr_b", "ovr_m", "lodds", "sel_H", "sel_D", "sel_A", "sel_O", "sel_U"]
     which = sys.argv[1]
+    X["r2"] = X.r ** 2
+    X["r_lp"] = X.r * X.lp_b
+    X["lp2"] = X.lp_b ** 2
+    X["r_ou"] = X.r * (X.sel_O + X.sel_U)
+    X["r_D"] = X.r * X.sel_D
+    X["lp_ou"] = X.lp_b * (X.sel_O + X.sel_U)
+    small = ["lp_b", "r", "r2", "r_lp", "lp2", "ovr_m", "sel_D", "sel_A", "sel_O", "sel_U", "r_ou", "r_D", "lp_ou"]
     if which == "lgb1":
         p = wf(base, lambda: OffsetLGBM(dict(num_leaves=4, min_data_in_leaf=2000, learning_rate=0.03), rounds=150), name="lgb1")
     elif which == "lgb2":
@@ -62,4 +69,10 @@ if __name__ == "__main__":
         p = wf(base, lambda: OffsetSoftmax(lam=1.0), name="lin1")
     elif which == "lgb1all":
         p = wf(base, lambda: OffsetLGBM(dict(num_leaves=4, min_data_in_leaf=2000, learning_rate=0.03), rounds=150), region=-1.0, name="lgb1all")
+    elif which == "cal1":
+        p = wf(small, lambda: OffsetSoftmax(lam=1.0), region=-0.03, name="cal1")
+    elif which == "cal1all":
+        p = wf(small, lambda: OffsetSoftmax(lam=1.0), region=-1.0, name="cal1all")
+    elif which == "cal0":
+        p = wf(["lp_b", "r", "sel_D", "sel_A", "sel_O", "sel_U"], lambda: OffsetSoftmax(lam=1.0), region=-0.03, name="cal0")
     show(which, p)

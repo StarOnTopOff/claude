@@ -1005,7 +1005,7 @@ function field() {
 
 /* ---------- liquid-glass lens (Chromium: SVG displacement as backdrop-filter) ---------- */
 function lens(el, id, bezel = 22, scale = 46) {
-  if (!window.chrome || RM) return;
+  if (!window.chrome || RM || location.hash.includes('nolens')) return;
   const r = el.getBoundingClientRect(), w = Math.round(r.width), h = Math.round(r.height);
   if (!w || !h) return;
   const rad = Math.min(h / 2, parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0);

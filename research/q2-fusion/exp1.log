@@ -7,3 +7,4 @@ baseline logloss {'train_1X2': 1.00862, 'train_OU': 0.68364, 'val_1X2': 1.00272,
 {"tag": "mkt+form", "g1": ["mkt", "form"], "g2": ["mkt", "form"], "lam": 0.001, "W": 10, "decay": 1.0, "d_1X2_train": -1.26, "d_OU_train": 0.3, "d_1X2_val": -1.55, "d_OU_val": 1.17, "sec": 28.2}
 {"tag": "mkt+stats", "g1": ["mkt", "stats"], "g2": ["mkt", "stats"], "lam": 0.001, "W": 10, "decay": 1.0, "d_1X2_train": -0.06, "d_OU_train": 1.95, "d_1X2_val": -0.7, "d_OU_val": -1.58, "sec": 19.5}
 {"tag": "mkt+ctx", "g1": ["mkt", "ctx"], "g2": ["mkt", "ctx"], "lam": 0.001, "W": 10, "decay": 1.0, "d_1X2_train": 1.79, "d_OU_train": 2.93, "d_1X2_val": -1.48, "d_OU_val": 1.78, "sec": 10.8}
+{"tag": "all", "g1": ["mkt", "mx", "xmkt", "rate", "form", "stats", "ctx", "lg"], "g2": ["mkt", "mx", "xmkt", "rate", "form", "stats", "ctx", "lg"], "lam": 0.001, "W": 10, "decay": 1.0, "d_1X2_train": 3.95, "d_OU_train": 9.34, "d_1X2_val": -1.79, "d_OU_val": 5.84, "sec": 150.0}
